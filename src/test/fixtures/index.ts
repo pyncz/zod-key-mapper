@@ -1,4 +1,1 @@
-/**
- * FIXME: Your test data
- */
-export {}
+export * from './input'
