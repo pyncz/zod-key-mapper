@@ -1,7 +1,7 @@
 {
   "name": "@pyncz/zod-key-mapper",
   "description": "Transform keys of zod object schemas",
-  "version": "0.0.0-development",
+  "version": "1.0.1",
   "license": "MIT",
   "type": "module",
   "author": "Pavel Yankovski <https://github.com/pyncz>",
@@ -20,7 +20,8 @@
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
     }
   },
   "files": [

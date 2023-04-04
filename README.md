@@ -4,6 +4,13 @@
 
 ---
 
+## Installation
+
+Just install it with your favourite package manager:
+```sh
+pnpm install @pyncz/zod-key-mapper
+```
+
 ## Usage
 
 Let's say, you use a 3rd party API to fetch some data. You want to parse and transform it with zod for further usage, including some operations with keys, e.g. mapping keys from *snake_case* to *camelCase*, or even change some confusing field names into something more convenient.
