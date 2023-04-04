@@ -69,6 +69,31 @@ describe.concurrent('transform keys', () => {
     expect(parsed).toMatchObject(inputObject)
   })
 
+  test('should respect zod native `pick` method', async () => {
+    const mappedSchema = mapped(
+      originalSchema.pick({ key1: true }),
+      'key1',
+      'key1mod',
+    )
+    const parsed = mappedSchema.parse(inputObject)
+    expect(parsed).toMatchObject({
+      key1mod: 'hey',
+    })
+  })
+
+  test('should respect zod native `omit` method', async () => {
+    const mappedSchema = mapped(
+      originalSchema.omit({ key1: true }),
+      'key2',
+      'key2mod',
+    )
+    const parsed = mappedSchema.parse(inputObject)
+    expect(parsed).toMatchObject({
+      key2mod: 69,
+      key3: 420,
+    })
+  })
+
   test('should throw a *runtime* exception if the key\'s new name is an empty string', async () => {
     // NOTE: Ignore ts checks it order to test runtime exceptions
     // @ts-expect-error Argument of type 'string' is not assignable to parameter of type 'never'.
