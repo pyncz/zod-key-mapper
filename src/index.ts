@@ -1,11 +1,11 @@
 import type { z } from 'zod'
-import type { InferK, InferV, NonEmptyRecord, OmitEmpty } from './models'
+import type { InferValue, NonEmptyRecord, OmitEmpty } from './models'
 
 export type Mapped<
   T extends Record<string, any>,
-  M extends { [key in keyof T]?: string },
-> = Omit<T, keyof OmitEmpty<M> | InferV<OmitEmpty<M>>>
-& { [newKey in InferV<OmitEmpty<M>>]: InferK<M, newKey> extends keyof T ? T[InferK<M, newKey>] : never }
+  M extends Partial<Record<keyof T, string>>,
+> = Omit<T, keyof OmitEmpty<M> | InferValue<OmitEmpty<M>>>
+& { [key in (keyof M & keyof T) as NonNullable<M[key]>]: T[key] }
 
 export const mapped = <
   T extends Record<string, any>,
@@ -25,7 +25,7 @@ export const mapped = <
         mappedData[keysMap[key] as keyof Mapped<T, M>] = data[key]
       } else if (!isNewKey) {
         // Don't override the [newKey] field by the old data if the new key matches an already existing key
-        mappedData[key as keyof Mapped<T, M>] = data[key]
+        mappedData[key as unknown as keyof Mapped<T, M>] = data[key]
       }
     }
 
