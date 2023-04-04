@@ -3,6 +3,7 @@
     "outDir": "dist",
     "target": "es2017",
     "module": "esnext",
+    "strict": true,
     "moduleResolution": "node",
     "sourceMap": false,
     "declaration": true,

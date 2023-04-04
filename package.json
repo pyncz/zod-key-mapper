@@ -1,12 +1,15 @@
 {
-  "name": "@pyncz/template.ts-lib",
-  "description": "A template for creating TypeScript NPM packages",
+  "name": "@pyncz/zod-key-mapper",
+  "description": "Transform keys of zod object schemas",
   "version": "0.0.0-development",
   "license": "MIT",
   "type": "module",
   "author": "Pavel Yankovski <https://github.com/pyncz>",
   "keywords": [
-    "typescript"
+    "typescript",
+    "zod",
+    "validation",
+    "keys"
   ],
   "scripts": {
     "build": "unbuild",
@@ -25,7 +28,9 @@
   ],
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.ts",
-  "dependencies": {},
+  "dependencies": {
+    "zod": "^3.21.0"
+  },
   "devDependencies": {
     "@antfu/eslint-config": "^0.26.2",
     "@antfu/ni": "^0.17.2",
@@ -39,7 +44,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/pyncz/template.ts-lib"
+    "url": "https://github.com/pyncz/zod-key-mapper"
   },
   "publishConfig": {
     "access": "public"
