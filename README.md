@@ -33,3 +33,20 @@ const schema = mapped(mapped(z.object({
 console.log(schema.parse({ key1: 'hey', key2: 69, key3: 420 }))
 // > { key1mod: 'hey', key2mod: 69, key3: 420 }
 ```
+
+### What's up with other keys operations?
+
+> "What if I want to add or remove keys, not just transform them?""
+
+Well, you should use [prick / omit](https://zod.dev/?id=pickomit) methods zod provides out of the box, before mapping:
+
+```ts
+const schema = mapped(z.object({
+  key1: z.string(),
+  key2: z.number(),
+  key3: z.number(),
+}).pick({ key1: true }), 'key1', 'key1mod')
+
+console.log(schema.parse({ key1: 'hey', key2: 69, key3: 420 }))
+// > { key1mod: 'hey' }
+```
