@@ -12,11 +12,7 @@ describe.concurrent('transform keys', () => {
 
   test('should parse the original schema without mapping', async () => {
     const parsed = originalSchema.parse(inputObject)
-    expect(parsed).toMatchObject({
-      key1: 'hey',
-      key2: 69,
-      key3: 420,
-    })
+    expect(parsed).toMatchObject(inputObject)
   })
 
   test('should parse a schema with a mapped key', async () => {
@@ -65,6 +61,12 @@ describe.concurrent('transform keys', () => {
       key1: 69,
       key3: 420,
     })
+  })
+
+  test('should keep the same schema if a key is mapped into itself', async () => {
+    const mappedSchema = mapped(originalSchema, 'key2', 'key2')
+    const parsed = mappedSchema.parse(inputObject)
+    expect(parsed).toMatchObject(inputObject)
   })
 
   test('should throw a *runtime* exception if the key\'s new name is an empty string', async () => {
