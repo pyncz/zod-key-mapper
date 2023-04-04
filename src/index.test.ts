@@ -16,7 +16,7 @@ describe.concurrent('transform keys', () => {
   })
 
   test('should parse a schema with a mapped key', async () => {
-    const mappedSchema = mapped(originalSchema, 'key1', 'key1mod')
+    const mappedSchema = mapped(originalSchema, { key1: 'key1mod' })
     const parsed = mappedSchema.parse(inputObject)
     expect(parsed).toMatchObject({
       key1mod: 'hey',
@@ -26,7 +26,7 @@ describe.concurrent('transform keys', () => {
   })
 
   test('should parse a schema with multiple mapped keys', async () => {
-    const mappedSchema = mapped(mapped(originalSchema, 'key1', 'key1mod'), 'key2', 'key2mod')
+    const mappedSchema = mapped(originalSchema, { key1: 'key1mod', key2: 'key2mod' })
     const parsed = mappedSchema.parse(inputObject)
     expect(parsed).toMatchObject({
       key1mod: 'hey',
@@ -35,8 +35,24 @@ describe.concurrent('transform keys', () => {
     })
   })
 
-  test('should parse a schema with a key mapped multiple times', async () => {
-    const mappedSchema = mapped(mapped(originalSchema, 'key1', 'key1mod'), 'key1mod', 'key1mod2x')
+  test('should parse a schema with multiple key mappings', async () => {
+    const mappedSchema = mapped(
+      mapped(originalSchema, { key1: 'key1mod' }),
+      { key2: 'key2mod' },
+    )
+    const parsed = mappedSchema.parse(inputObject)
+    expect(parsed).toMatchObject({
+      key1mod: 'hey',
+      key2mod: 69,
+      key3: 420,
+    })
+  })
+
+  test('should parse a schema with one key mapped multiple times', async () => {
+    const mappedSchema = mapped(
+      mapped(originalSchema, { key1: 'key1mod' }),
+      { key1mod: 'key1mod2x' },
+    )
     const parsed = mappedSchema.parse(inputObject)
     expect(parsed).toMatchObject({
       key1mod2x: 'hey',
@@ -46,7 +62,7 @@ describe.concurrent('transform keys', () => {
   })
 
   test('should override an existing subsequent key if a new one is mapped into it', async () => {
-    const mappedSchema = mapped(originalSchema, 'key1', 'key2')
+    const mappedSchema = mapped(originalSchema, { key1: 'key2' })
     const parsed = mappedSchema.parse(inputObject)
     expect(parsed).toMatchObject({
       key2: 'hey',
@@ -55,7 +71,7 @@ describe.concurrent('transform keys', () => {
   })
 
   test('should override an existing preceding key if a new one is mapped into it', async () => {
-    const mappedSchema = mapped(originalSchema, 'key2', 'key1')
+    const mappedSchema = mapped(originalSchema, { key2: 'key1' })
     const parsed = mappedSchema.parse(inputObject)
     expect(parsed).toMatchObject({
       key1: 69,
@@ -64,7 +80,7 @@ describe.concurrent('transform keys', () => {
   })
 
   test('should keep the same schema if a key is mapped into itself', async () => {
-    const mappedSchema = mapped(originalSchema, 'key2', 'key2')
+    const mappedSchema = mapped(originalSchema, { key2: 'key2' })
     const parsed = mappedSchema.parse(inputObject)
     expect(parsed).toMatchObject(inputObject)
   })
@@ -72,8 +88,7 @@ describe.concurrent('transform keys', () => {
   test('should respect zod native `pick` method', async () => {
     const mappedSchema = mapped(
       originalSchema.pick({ key1: true }),
-      'key1',
-      'key1mod',
+      { key1: 'key1mod' },
     )
     const parsed = mappedSchema.parse(inputObject)
     expect(parsed).toMatchObject({
@@ -83,20 +98,21 @@ describe.concurrent('transform keys', () => {
 
   test('should respect zod native `omit` method', async () => {
     const mappedSchema = mapped(
-      originalSchema.omit({ key1: true }),
-      'key2',
-      'key2mod',
+      originalSchema.omit({ key2: true }),
+      { key1: 'key1mod' },
     )
     const parsed = mappedSchema.parse(inputObject)
     expect(parsed).toMatchObject({
-      key2mod: 69,
+      key1mod: 'hey',
       key3: 420,
     })
   })
 
-  test('should throw a *runtime* exception if the key\'s new name is an empty string', async () => {
-    // NOTE: Ignore ts checks it order to test runtime exceptions
+  test('should skip mapping and keep an old key if its new name is an empty string', async () => {
+    // NOTE: Ignore ts checks it order to test runtime execution
     // @ts-expect-error Argument of type 'string' is not assignable to parameter of type 'never'.
-    expect(() => mapped(originalSchema, 'key1', '')).toThrowError()
+    const mappedSchema = mapped(originalSchema, { key1: '' })
+    const parsed = mappedSchema.parse(inputObject)
+    expect(parsed).toMatchObject(inputObject)
   })
 })

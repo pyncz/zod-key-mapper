@@ -1,31 +1,34 @@
 import type { z } from 'zod'
-import type { MappedSchema } from './models'
+import type { InferK, InferV, NonEmptyRecord, OmitEmpty } from './models'
+
+export type Mapped<
+  T extends Record<string, any>,
+  M extends { [key in keyof T]?: string },
+> = Omit<T, keyof OmitEmpty<M> | InferV<OmitEmpty<M>>>
+& { [newKey in InferV<OmitEmpty<M>>]: InferK<M, newKey> extends keyof T ? T[InferK<M, newKey>] : never }
 
 export const mapped = <
   T extends Record<string, any>,
-  OldKey extends keyof T,
-  NewKey extends string,
+  M extends Partial<Record<keyof T, string>>,
 >(
     schema: z.ZodType<T, z.ZodTypeDef, any>,
-    oldKey: OldKey,
-    newKey: NewKey extends '' ? never : NewKey,
-  ): z.ZodType<MappedSchema<T, OldKey, NewKey>, z.ZodTypeDef, T> => {
-  if (!newKey) {
-    throw new Error('The mapped key\'s name cannot be an empty string!')
-  }
-
+    keysMap: keyof M extends keyof T ? NonEmptyRecord<M> : never,
+  ): z.ZodType<Mapped<T, M>, z.ZodTypeDef, T> => {
   return schema.transform((data) => {
-    const mappedData = {} as MappedSchema<T, OldKey, NewKey>
+    const mappedData = {} as Mapped<T, M>
 
-    for (const k in data) {
-      const key = k as keyof T
-      if (key === oldKey) {
-        mappedData[newKey as keyof MappedSchema<T, OldKey, NewKey>] = data[key]
-      } else if (key !== newKey) {
+    for (const key in data) {
+      const isOldKey = Object.keys(keysMap).includes(key)
+      const isNewKey = Object.values(keysMap).includes(key)
+
+      if (isOldKey && keysMap[key]) {
+        mappedData[keysMap[key] as keyof Mapped<T, M>] = data[key]
+      } else if (!isNewKey) {
         // Don't override the [newKey] field by the old data if the new key matches an already existing key
-        mappedData[key as keyof MappedSchema<T, OldKey, NewKey>] = data[key]
+        mappedData[key as keyof Mapped<T, M>] = data[key]
       }
     }
+
     return mappedData
   })
 }

@@ -4,6 +4,8 @@
 
 ---
 
+## Usage
+
 Let's say, you use a 3rd party API to fetch some data. You want to parse and transform it with zod for further usage, including some operations with keys, e.g. mapping keys from *snake_case* to *camelCase*, or even change some confusing field names into something more convenient.
 
 `@pyncz/zod-key-mapper` provides a convenient way to transform keys:
@@ -16,25 +18,41 @@ const schema = mapped(z.object({
   snake_case_field: z.string(),
   foo: z.number(),
   bar: z.number(),
-}), 'snake_case_field', 'weRespectCamelsHere')
+}), { snake_case_field: 'weRespectCamelsHere' })
 
 console.log(schema.parse({ snake_case_field: 'hey', foo: 69, bar: 420 }))
 // > { weRespectCamelsHere: 'hey', foo: 69, bar: 420 }
 ```
 
-Or you can map multiple keys:
+You can map multiple keys:
 ```ts
-const schema = mapped(mapped(z.object({
+const schema = mapped(z.object({
   key1: z.string(),
   key2: z.number(),
   key3: z.number(),
-}), 'key1', 'key1mod'), 'key2', 'key2mod')
+}), { key1: 'key1mod', key2: 'key2mod' })
 
 console.log(schema.parse({ key1: 'hey', key2: 69, key3: 420 }))
 // > { key1mod: 'hey', key2mod: 69, key3: 420 }
 ```
 
-### What's up with other keys operations?
+Or you can map the schema key by key:
+```ts
+const schema = mapped(mapped(z.object({
+  key1: z.string(),
+  key2: z.number(),
+  key3: z.number(),
+}), { key1: 'key1mod' }), { key2: 'key2mod' })
+
+console.log(schema.parse({ key1: 'hey', key2: 69, key3: 420 }))
+// > { key1mod: 'hey', key2mod: 69, key3: 420 }
+```
+
+#### Arguments
+- `schema` - your Zod type
+- `keysMap` - a readonly object with **keys you want to rename** as keys, and **corresponding new keys** as values.
+
+## What's up with other keys operations?
 
 > "What if I want to add or remove keys, not just transform them?""
 
@@ -45,7 +63,7 @@ const schema = mapped(z.object({
   key1: z.string(),
   key2: z.number(),
   key3: z.number(),
-}).pick({ key1: true }), 'key1', 'key1mod')
+}).pick({ key1: true }), { key1: 'key1mod' })
 
 console.log(schema.parse({ key1: 'hey', key2: 69, key3: 420 }))
 // > { key1mod: 'hey' }
