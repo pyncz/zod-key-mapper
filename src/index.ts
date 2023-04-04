@@ -21,9 +21,8 @@ export const mapped = <
       const key = k as keyof T
       if (key === oldKey) {
         mappedData[newKey as keyof MappedSchema<T, OldKey, NewKey>] = data[key]
-      }
-      // Don't override the [newKey] field by the old data if the new key matches an already existing key
-      if (key !== newKey) {
+      } else if (key !== newKey) {
+        // Don't override the [newKey] field by the old data if the new key matches an already existing key
         mappedData[key as keyof MappedSchema<T, OldKey, NewKey>] = data[key]
       }
     }
