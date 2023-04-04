@@ -67,7 +67,9 @@ describe.concurrent('transform keys', () => {
     })
   })
 
-  test('should throw an exception if the key\'s new name is the empty string', async () => {
+  test('should throw a *runtime* exception if the key\'s new name is an empty string', async () => {
+    // NOTE: Ignore ts checks it order to test runtime exceptions
+    // @ts-expect-error Argument of type 'string' is not assignable to parameter of type 'never'.
     expect(() => mapped(originalSchema, 'key1', '')).toThrowError()
   })
 })

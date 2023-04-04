@@ -4,12 +4,16 @@ import type { MappedSchema } from './models'
 export const mapped = <
   T extends Record<string, any>,
   OldKey extends keyof T,
-  NewKey extends Exclude<string, ''>,
+  NewKey extends string,
 >(
     schema: z.ZodType<T, z.ZodTypeDef, any>,
     oldKey: OldKey,
-    newKey: NewKey,
+    newKey: NewKey extends '' ? never : NewKey,
   ): z.ZodType<MappedSchema<T, OldKey, NewKey>, z.ZodTypeDef, T> => {
+  if (!newKey) {
+    throw new Error('The mapped key\'s name cannot be an empty string!')
+  }
+
   return schema.transform((data) => {
     const mappedData = {} as MappedSchema<T, OldKey, NewKey>
 
