@@ -63,7 +63,7 @@ console.log(schema.parse({ key1: 'hey', key2: 69, key3: 420 }))
 
 > "What if I want to add or remove keys, not just transform them?"
 
-Well, you should use [prick / omit](https://zod.dev/?id=pickomit) methods zod provides out of the box, before mapping:
+Well, you should use [pick / omit](https://zod.dev/?id=pickomit) methods zod provides out of the box, before mapping:
 
 ```ts
 const schema = mapped(z.object({
